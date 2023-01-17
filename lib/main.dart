@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:store_api_flutter_course/screens/feeds_view_screen.dart';
 
 import 'consts/global_colors.dart';
 import 'screens/home_screen.dart';
