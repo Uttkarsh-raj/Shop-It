@@ -2,7 +2,9 @@ import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 import 'package:store_api_flutter_course/consts/global_colors.dart';
+import 'package:store_api_flutter_course/models/product_model.dart';
 
 import '../screens/product_details.dart';
 
@@ -11,9 +13,11 @@ class FeedsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ProductModel productModelProvider =
+        Provider.of<ProductModel>(context);
     Size size = MediaQuery.of(context).size;
     return Padding(
-      padding: EdgeInsets.all(8),
+      padding: const EdgeInsets.all(8),
       child: Material(
         borderRadius: BorderRadius.circular(8),
         color: Theme.of(context).cardColor,
@@ -33,7 +37,7 @@ class FeedsWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: EdgeInsets.only(left: 5, right: 5, top: 8),
+                  padding: const EdgeInsets.only(left: 5, right: 5, top: 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -46,7 +50,7 @@ class FeedsWidget extends StatelessWidget {
                             ),
                             children: <TextSpan>[
                               TextSpan(
-                                text: '168.90',
+                                text: '${productModelProvider.price}',
                                 style: TextStyle(
                                   color: lightTextColor,
                                   fontWeight: FontWeight.w600,
@@ -71,26 +75,26 @@ class FeedsWidget extends StatelessWidget {
                       color: Colors.red,
                       size: 28,
                     ),
-                    imageUrl: "http://i.ibb.co/vwB46Yq/shoes.png",
+                    imageUrl: productModelProvider.images![0],
                     boxFit: BoxFit.fill,
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Padding(
-                  padding: EdgeInsets.all(8),
+                Padding(
+                  padding: const EdgeInsets.all(8),
                   child: Text(
-                    'Title',
+                    productModelProvider.title.toString(),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: size.height * 0.01,
-                ),
+                // SizedBox(
+                //   height: size.height * 0.01,
+                // ),
               ],
             ),
           ),

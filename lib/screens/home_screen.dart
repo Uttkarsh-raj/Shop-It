@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:store_api_flutter_course/consts/global_colors.dart';
+import 'package:store_api_flutter_course/models/product_model.dart';
 import 'package:store_api_flutter_course/screens/categories_screen.dart';
 import 'package:store_api_flutter_course/screens/feeds_view_screen.dart';
 import 'package:store_api_flutter_course/screens/users.dart';
 import 'package:store_api_flutter_course/services/api_handler.dart';
 import 'package:store_api_flutter_course/widgets/appbar_icon.dart';
+import 'package:store_api_flutter_course/widgets/feeds_grid_widget.dart';
 import 'package:store_api_flutter_course/widgets/feeds_widget.dart';
 import 'package:store_api_flutter_course/widgets/sale_widget.dart';
 
@@ -28,9 +30,16 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  List<ProductModel> productsList = [];
+
+  Future<void> getProducts() async {
+    productsList = await Api_handler.getAll();
+    setState(() {});
+  }
+
   @override
   void didChangeDependencies() {
-    Api_handler.getAll();
+    getProducts();
     super.didChangeDependencies();
   }
 
@@ -162,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Navigator.push(
                                   context,
                                   PageTransition(
-                                    child: const FeedsScreen(),
+                                    child: FeedsScreen(),
                                     type: PageTransitionType.fade,
                                   ),
                                 );
@@ -175,19 +184,23 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       const SizedBox(height: 18),
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 0.0,
-                          mainAxisSpacing: 0.0,
-                          childAspectRatio: 0.6,
-                        ),
-                        itemCount: 4,
-                        itemBuilder: (context, index) {
-                          return const FeedsWidget();
+                      FutureBuilder(
+                        future: Api_handler.getAll(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                              child: Text('An error occured ${snapshot.error}'),
+                            );
+                          } else if (snapshot.data == null) {
+                            return const Center(
+                              child: Text('No items found..!!'),
+                            );
+                          }
+                          return FeedsGridWidget(productsList: productsList);
                         },
                       ),
                     ],

@@ -1,6 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:store_api_flutter_course/models/category_model.dart';
 
-class ProductModel {
+class ProductModel with ChangeNotifier {
   //class
   int? id;
   String? title;
@@ -48,5 +49,11 @@ class ProductModel {
       data['category'] = this.category!.toJson();
     }
     return data;
+  }
+
+  static List<ProductModel> productsFromSnapshot(List productSnapshot) {
+    return productSnapshot.map((data) {
+      return ProductModel.fromJson(data);
+    }).toList();
   }
 }
