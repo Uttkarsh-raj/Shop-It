@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<ProductModel> productsList = [];
 
   Future<void> getProducts() async {
-    productsList = await Api_handler.getAll();
+    productsList = await Api_handler.getAll(limit: 10.toString());
     setState(() {});
   }
 
@@ -185,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 18),
                       FutureBuilder(
-                        future: Api_handler.getAll(),
+                        future: Api_handler.getAll(limit: 3.toString()),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {

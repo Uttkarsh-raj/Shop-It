@@ -13,17 +13,44 @@ class FeedsScreen extends StatefulWidget {
 }
 
 class _FeedsScreenState extends State<FeedsScreen> {
+  final ScrollController scrollController = ScrollController();
   List<ProductModel> productsList = [];
+  int limit = 10;
+  bool _isLoading = false;
+  bool _isLimit = false;
 
   Future<void> getProducts() async {
-    productsList = await Api_handler.getAll();
+    productsList = await Api_handler.getAll(limit: limit.toString());
     setState(() {});
   }
 
   @override
-  void didChangeDependencies() {
+  void initState() {
     getProducts();
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
     super.didChangeDependencies();
+    scrollController.addListener(() async {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
+        _isLoading = true;
+        limit += 10;
+        if (limit == 200) {
+          _isLimit = true;
+        }
+        await getProducts();
+        // _isLoading = false;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -34,22 +61,32 @@ class _FeedsScreenState extends State<FeedsScreen> {
       ),
       body: productsList.isEmpty
           ? const Center(child: CircularProgressIndicator())
-          : GridView.builder(
-              // shrinkWrap: true,
-              // physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 0.0,
-                mainAxisSpacing: 0.0,
-                childAspectRatio: 0.6,
+          : SingleChildScrollView(
+              controller: scrollController,
+              child: Column(
+                children: [
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 0.0,
+                      mainAxisSpacing: 0.0,
+                      childAspectRatio: 0.6,
+                    ),
+                    itemCount: productsList.length,
+                    itemBuilder: (context, index) {
+                      return ChangeNotifierProvider.value(
+                        value: productsList[index],
+                        child: const FeedsWidget(),
+                      );
+                    },
+                  ),
+                  if (!_isLimit)
+                    const Center(child: CircularProgressIndicator())
+                ],
               ),
-              itemCount: productsList.length,
-              itemBuilder: (context, index) {
-                return ChangeNotifierProvider.value(
-                  value: productsList[index],
-                  child: const FeedsWidget(),
-                );
-              },
             ),
     );
   }
